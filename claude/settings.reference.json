@@ -59,7 +59,8 @@
     "power-bi-agentic-development": {
       "source": {
         "source": "github",
-        "repo": "data-goblin/power-bi-agentic-development"
+        "repo": "data-goblin/power-bi-agentic-development",
+        "ref": "v26.40.2"
       }
     },
     "mattpocock": {

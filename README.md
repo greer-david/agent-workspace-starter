@@ -6,16 +6,23 @@ A sanitized snapshot of David Greer's Herdr, Claude Code and Codex setup, intend
 
 ## Included
 
-- `codex/config.toml`: actual reusable model, effort, automatic approval reviewer, footer, terminal title and plugin settings. Power BI plugins reference v26.40.2 to match the source setup.
+- `codex/config.toml`: actual reusable model, effort, automatic approval reviewer, footer, terminal title and plugin settings. Power BI plugins record the source snapshot v26.40.2; a supplied work repo's current pin takes precedence.
 - `claude/settings.reference.json`: shared plugins, model/effort, UI and workflow preferences. Private plugins, HEY, clerk, Rex and machine-specific status commands are excluded.
 - `shell/`: merge-only Bash startup templates for Git Bash.
+- `docs/project-setup.md`: required coordination workflow when a work repo supplies its own setup checks and plugin policy.
 - `docs/terminal-workspace.md`: required layout workflow that keeps full agent terminals central with familiar navigation and review panels.
 - `herdr/`: themes, shortcut reference, Files/Changes/Work panels, quick capture, fork-Claude.
 - `scripts/herdr-tab-title.py`: numbered tab-title helper for Claude and Codex; runs only against a detected Herdr terminal.
 
+Fresh and continuation prompts: [copy-paste setup prompts](docs/setup-prompts.md). Add the work repository URL when applicable.
+
 ## Instructions for the setup agent
 
 The user authorizes installation and configuration of this workspace. Inspect first, back up before edits, merge existing customizations, and perform the setup. Ask only for information or manual authentication that is actually needed. Follow organization policy and existing sandbox restrictions.
+
+### Start: fresh install or continuation
+
+On a fresh machine, inventory existing tools and follow the setup sequence below. When a work repository is supplied, read and carry out [project setup coordination](docs/project-setup.md) before installing overlapping plugins; its current setup checker and plugin policy govern project requirements. Complete both that checker's results and this starter's workspace checks.
 
 ### 0. Resume a paused setup
 
@@ -55,20 +62,20 @@ Read this section before editing Herdr shell settings or Bash startup files. The
    ```
 
    Substitute the discovered executable path. Merge into the proper TOML scope, preserving other settings. Verify against the installed version. Inspect desktop, workspace and launch-template overrides if a new pane still opens PowerShell. Test in a NEW pane; keep existing sessions running. A quoted executable string inside the array must not contain extra shell quote characters.
-3. Back up startup files and merge `shell/bashrc.reference` into `.bashrc`. Use one identifiable managed block; update it on rerun rather than appending duplicates. Preserve the user's aliases, prompt and other setup. Only add verified tool directories; translate discovered Windows paths with `cygpath` where needed. Keep Git Bash's standard inherited PATH. Ensure `claude`, `codex`, `git`, `hc`, `herdr-app` and the chosen Python/runtime resolve correctly.
+3. Back up startup files and merge `shell/bashrc.reference` into `.bashrc`. Use one identifiable managed block; update it on rerun rather than appending duplicates. Preserve correct and useful aliases, prompt and other setup. Repair broken paths, duplicate/conflicting setup and incomplete prior edits after backing up; existing content is not automatically correct. Only add verified tool directories; translate discovered Windows paths with `cygpath` where needed. Keep Git Bash's standard inherited PATH. Ensure `claude`, `codex`, `git`, `hc`, `herdr-app` and the chosen Python/runtime resolve correctly.
 4. Merge `shell/bash-profile.reference` into the active login startup file only if it does not already source `.bashrc`. Bash reads the first available `.bash_profile`, `.bash_login`, or `.profile`; preserve that chain. Do not create a new `.bash_profile` that shadows an existing `.profile` without preserving the latter's behavior. Avoid duplicate or recursive sourcing.
 5. Keep tokens, auto-login commands, agent auto-launch, global MSYS path-conversion switches, and package-install commands out of startup files. Optional prompt tools can be retained if already installed; they are not prerequisites. Hooks may run noninteractively and cannot rely on `.bashrc` or its aliases: give them explicit executable paths and required environment separately. Do not assume selecting Git Bash in Herdr selects Codex's internal command shell.
 6. Validate startup syntax with the discovered Git Bash `bash.exe -n` for each changed file. In a fresh Herdr pane, confirm `$BASH_VERSION`, `$0`, `shopt -q login_shell`, working directory, executable lookup and actual agent launches. Source the managed block twice in a controlled interactive shell and confirm PATH entries do not accumulate. Keep output free of tokens and unrelated environment values.
 
 ### 2. Configure Codex
 
-Merge `codex/config.toml` into the active user configuration. Respect CODEX_HOME if set. Validate all fields and footer items against the installed version. Preserve the requested model if available; report incompatibilities instead of silently replacing it. Install marketplaces/plugins through supported commands or UI; config entries alone may not install them.
+Merge `codex/config.toml` into the active user configuration. When a work repo is supplied, resolve its current plugin selection and pin first via `docs/project-setup.md`; override the starter snapshot accordingly without copying project-only settings globally. Respect CODEX_HOME if set. Validate all fields and footer items against the installed version. Preserve the requested model if available; report incompatibilities instead of silently replacing it. Install marketplaces/plugins through supported commands or UI; config entries alone may not install them.
 
 Explain `approvals_reviewer = "auto_review"` using the installed version's documentation before applying it. Preserve sandbox restrictions and managed policy. Do not trust the user's entire home directory or fabricate hook trust hashes. Let the user approve specific projects and hooks through normal mechanisms.
 
 ### 3. Configure Claude Code
 
-Merge the reference settings. Register marketplaces and install enabled plugins through supported commands. Check version compatibility before applying preferences such as disabling auto-compaction, automatic memory, bundled skills or tools. Explain the effects of the permission deny list; these are source preferences, not prerequisites for Herdr. Preserve a coworker's existing policy settings.
+Treat `claude/settings.reference.json` as a reference, not a wholesale settings file to apply. Match the model/effort, plugins, HUD and appearance; assess behavioral preferences separately. The permission deny list, long retention, disabled memory/auto-compaction/bundled skills and other workflow switches are David's personal choices, not requirements for the coworker. Explain them and retain the coworker's existing choices unless requested. For a work repo, resolve its plugin selection and pin first via `docs/project-setup.md`, then register marketplaces and install the required plugins through supported commands. The global Matt Pocock plugin is optional when checked-in project skills already provide the desired workflows. Check version compatibility before applying preferences such as disabling auto-compaction, automatic memory, bundled skills or tools. Explain the effects of the permission deny list; these are source preferences, not prerequisites for Herdr. Preserve a coworker's existing policy settings.
 
 Install claude-hud as a plugin and run its supported setup workflow (currently `/claude-hud:setup`; verify). Generate the Windows statusLine command for the selected shell/runtime. Do not use macOS Homebrew paths. Configure runtime dependencies and verify the HUD actually renders.
 
@@ -96,6 +103,8 @@ Install `scripts/herdr-tab-title.py` in a stable user tools directory. Wire the 
 Do not rely on the script's Unix shebang. Resolve `herdr-app` and `hc` from the actual hook environment, including executable extensions if required. The helper normalizes transcript separators for Codex detection, but further Windows adaptations may be needed. Read the script: its errors intentionally do not block agents, so absence of hook errors does NOT prove tab titles work. Verify visible title changes. Exercise multiple sessions in the same directory to avoid renaming the wrong tab. Preserve manually named tabs.
 
 ### 6. Verify and finish
+
+If a work repo was supplied, rerun its setup checker and complete its manual checklist per `docs/project-setup.md`. Report all unresolved or skipped checks separately from Herdr verification.
 
 Complete the acceptance checks in `docs/terminal-workspace.md`, including visible launch controls, a separate Git Bash shell, retained interactive terminal behavior and laptop-sized layout review.
 
