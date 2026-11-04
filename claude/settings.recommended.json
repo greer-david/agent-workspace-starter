@@ -1,0 +1,24 @@
+{
+  "env": {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1"
+  },
+  "model": "opus",
+  "modelSettings": {
+    "claude-opus-5": { "effortLevel": "medium" },
+    "claude-opus-5-5": { "effortLevel": "low" }
+  },
+  "theme": "dark",
+  "preferredNotifChannel": "terminal_bell",
+  "agentPushNotifEnabled": true,
+  "enabledPlugins": {
+    "claude-hud@claude-hud": true,
+    "caveman@caveman": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-hud": { "source": { "source": "github", "repo": "jarrodwatts/claude-hud" } },
+    "caveman": { "source": { "source": "github", "repo": "JuliusBrussee/caveman" } },
+    "openai-codex": { "source": { "source": "github", "repo": "openai/codex-plugin-cc" } }
+  }
+}

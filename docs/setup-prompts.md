@@ -1,29 +1,31 @@
 # Copy-paste setup prompts
 
-If onboarding to a work repository, add its URL to either prompt. The agent must inspect its current setup instructions and `check-setup` workflow alongside this starter.
+Paste one into Claude Code or Codex on the Windows machine. Replace `<WORK_REPO_URL>` with the work repository, or delete that paragraph.
 
-## Fresh machine
+## New machine
 
 ```text
 Set up my Windows machine using https://github.com/greer-david/agent-workspace-starter.
 
-Fetch the latest version and read README.md, docs/project-setup.md and docs/terminal-workspace.md. Inspect first, then perform the setup. This is a fresh onboarding; reuse anything already installed correctly.
+Clone or update it, read README.md, and do the Tier 1 setup: install missing tools, use Git Bash as Herdr's shell with native Claude Code and Codex, set up my Bash startup files (back up first; keep my working customizations), and apply the recommended Claude/Codex settings. Keep PowerShell available.
 
-Use Git Bash as Herdr Desktop's default interactive shell and native Windows Claude Code and Codex. Configure and validate Bash startup files, repairing incorrect configuration after backing it up and preserving useful customizations. Keep PowerShell available for Windows tasks.
+Work repo: <WORK_REPO_URL>. Use my work GitHub account, clone or inspect its default branch without changing my local work, and follow docs/project-setup.md: its check-setup script and plugin pin decide the Power BI plugins and project tools.
 
-If I supplied a work repository, read its agent instructions, current setup docs, check-setup skill and checker script. Use the coworker's authenticated work account, verify access/SSO, and inspect or clone its default development branch. Run its setup checks from its root inside Git Bash. Let that repo govern required tools, plugin selection and pinned versions. Avoid duplicate global skills that the project already supplies. Preserve its hooks and guardrails. Use the public starter for personal workspace configuration.
+Run `bash verify.sh --repo <clone>` from a new Herdr pane and fix what it reports. I'll do logins, SSO and admin prompts when you ask; never ask me for tokens or passwords.
 
-Install missing supported tools and apply safe local configuration under this request. I will handle interactive login, SSO, admin prompts and identity choices when needed. Use my accounts; never copy someone else's credentials or identity.
-
-Keep the full Claude/Codex terminal central, with project/agent navigation, visible Start Claude/Start Codex/Open Shell actions and collapsible Files/Changes panels. Open Shell must create a separate Git Bash session. Follow the repository's layout guide and preserve full terminal functionality.
-
-Complete both the work repo's setup/manual checks and the starter's workspace checks. Clearly report fixed, deferred, blocked and unverified items, plus login/reload/restart steps. Keep personal setup records local; do not change project source or cloud resources for onboarding.
+When Tier 1 passes, tell me what's left in "Check by hand", then offer Tier 2 (tab titles). Report what's fixed, what's waiting on me, and any warnings you left, and keep the setup record on this machine.
 ```
 
-## Paused setup
-
-Use the fresh-machine prompt above, replacing its opening instruction with:
+## Paused or partial setup
 
 ```text
-Continue a paused Windows setup using https://github.com/greer-david/agent-workspace-starter. Fetch its latest version. Before changing anything, inspect prior changes, backups, running installers and existing sessions. Preserve correct completed work and repair incomplete or incorrect setup after backing it up. Follow the README's paused-setup audit, then continue from the first unmet requirement rather than reinstalling everything.
+Continue my paused Windows setup using https://github.com/greer-david/agent-workspace-starter.
+
+Update the clone and read README.md. Before changing anything, check for running installers or agent sessions and ask me before stopping any. Then run `bash verify.sh` (add `--repo <clone>` for <WORK_REPO_URL> if it's cloned) and fix what it reports in order, backing up each file first. Keep working installs, plugins, logins and correct customizations. The target is Git Bash as Herdr's shell with native Claude Code and Codex; if an earlier step chose PowerShell as the default, change only that setting.
+
+Re-run verify.sh until it passes, then walk me through "Check by hand" and report fixed, waiting-on-me and remaining warnings.
 ```
+
+## Getting help remotely
+
+If David is helping from another machine, have the agent post `verify.sh` output and blockers as comments on a GitHub issue he names. Remote Control may be disabled for the work account.

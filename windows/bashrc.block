@@ -1,0 +1,32 @@
+# >>> agent-workspace >>>
+# Managed block from agent-workspace-starter. Re-running setup replaces the
+# text between these markers; keep personal lines outside them.
+# Safe anywhere in ~/.bashrc: it never returns early, and it only acts in
+# interactive shells. Hooks and Herdr mods don't read this file, so give them
+# explicit executable paths instead.
+if [[ $- == *i* ]]; then
+  for _aw_dir in "$HOME/.local/bin" "$HOME/bin"; do
+    if [ -d "$_aw_dir" ]; then
+      case ":$PATH:" in
+        *":$_aw_dir:"*) ;;
+        *) PATH="$_aw_dir:$PATH" ;;
+      esac
+    fi
+  done
+  unset _aw_dir
+  export PATH
+
+  # UTF-8 for Python tools started from this shell (tab titles, hook payloads).
+  export PYTHONUTF8=1
+  export PYTHONIOENCODING=utf-8
+
+  # Native jq.exe writes CRLF to Git Bash; -b keeps plain LF.
+  if jq --help 2>/dev/null | grep -q -- '--binary'; then
+    alias jq='jq -b'
+  fi
+
+  # Keep the user's own versions if they already define these.
+  alias ll >/dev/null 2>&1 || alias ll='ls -alF'
+  alias la >/dev/null 2>&1 || alias la='ls -A'
+fi
+# <<< agent-workspace <<<
