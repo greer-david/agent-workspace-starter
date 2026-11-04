@@ -9,6 +9,7 @@ A sanitized snapshot of David Greer's Herdr, Claude Code and Codex setup, intend
 - `codex/config.toml`: actual reusable model, effort, automatic approval reviewer, footer, terminal title and plugin settings. Power BI plugins reference v26.40.2 to match the source setup.
 - `claude/settings.reference.json`: shared plugins, model/effort, UI and workflow preferences. Private plugins, HEY, clerk, Rex and machine-specific status commands are excluded.
 - `shell/`: merge-only Bash startup templates for Git Bash.
+- `docs/terminal-workspace.md`: required layout workflow that keeps full agent terminals central with familiar navigation and review panels.
 - `herdr/`: themes, shortcut reference, Files/Changes/Work panels, quick capture, fork-Claude.
 - `scripts/herdr-tab-title.py`: numbered tab-title helper for Claude and Codex; runs only against a detected Herdr terminal.
 
@@ -84,6 +85,10 @@ Windows adaptations still required:
 - Fork-Claude checks foreground process and session files. The bundled filename check accepts Windows separators and exe/cmd suffixes, but verify actual Windows process/session discovery. If Claude runs through a wrapper, adapt detection using installed tool documentation. Forking shares the working tree; it does not create a worktree.
 - Read the installed guide for agent status integration. Configure it for both agents; do not equate tab naming with working/waiting/completed status.
 
+### 4a. Make the workspace approachable while retaining full terminal access
+
+After Git Bash and both agents work, read and carry out [the terminal workspace guide](docs/terminal-workspace.md). This is part of the requested setup. Keep real Claude/Codex terminals central; use visible project/agent navigation, launch actions, Files/Changes and a separate Open Shell action. Reuse built-in controls first. Verify the resulting layout on the coworker's machine; the guide is an implementation brief, not an already installed layout.
+
 ### 5. Wire tab titles
 
 Install `scripts/herdr-tab-title.py` in a stable user tools directory. Wire the supported Stop hook in BOTH Claude and Codex to an explicit Python executable and the script's quoted absolute Windows path. Preserve existing hooks. Read current hook schemas before editing; do not assume both agents use identical casing or event fields.
@@ -91,6 +96,8 @@ Install `scripts/herdr-tab-title.py` in a stable user tools directory. Wire the 
 Do not rely on the script's Unix shebang. Resolve `herdr-app` and `hc` from the actual hook environment, including executable extensions if required. The helper normalizes transcript separators for Codex detection, but further Windows adaptations may be needed. Read the script: its errors intentionally do not block agents, so absence of hook errors does NOT prove tab titles work. Verify visible title changes. Exercise multiple sessions in the same directory to avoid renaming the wrong tab. Preserve manually named tabs.
 
 ### 6. Verify and finish
+
+Complete the acceptance checks in `docs/terminal-workspace.md`, including visible launch controls, a separate Git Bash shell, retained interactive terminal behavior and laptop-sized layout review.
 
 Verify a NEW Herdr pane opens login-interactive Git Bash, startup files load once, and tools resolve without depending on the old PowerShell session. Verify actual launches of both agents inside Herdr; footer/HUD rendering; agent activity status; tab-title updates after turns; Files, Changes and Work panels; quick capture into the chosen destination; fork-Claude; keyboard shortcuts; plugin loading and runtime dependencies. Authenticate using the coworker's own accounts; never request credentials in chat.
 
