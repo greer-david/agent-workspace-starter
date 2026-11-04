@@ -52,8 +52,26 @@ echo "Shell"
 if [ "$win" = 1 ]; then
   ok "Git Bash ($(uname -s))"
   if [ -n "${BASH_VERSION:-}" ]; then ok "bash $BASH_VERSION"; fi
-  if shopt -q login_shell; then ok "login shell"
-  else warn "not a login shell" "Herdr's shell should be ['...\\Git\\bin\\bash.exe', '--login', '-i'] (windows/herdr-core.config.toml)."; fi
+  # `bash verify.sh` is itself never a login shell, so look at what launched
+  # it: the Herdr pane's argv, else the parent process's command line.
+  login_args=""; login_src=""
+  if [ -n "${HC_TERMINAL_ID:-}" ] && has hc && has jq; then
+    login_args=$(hc get --json "$HC_TERMINAL_ID" 2>/dev/null | jqr -r '.argv // [] | join("\n")' 2>/dev/null)
+    [ -n "$login_args" ] && login_src="Herdr pane $HC_TERMINAL_ID"
+  fi
+  if [ -z "$login_args" ] && [ -r "/proc/$PPID/cmdline" ]; then
+    login_args=$(tr '\0' '\n' <"/proc/$PPID/cmdline")
+    [ -n "$login_args" ] && login_src="parent process $PPID"
+  fi
+  if shopt -q login_shell; then
+    ok "login shell"
+  elif printf '%s\n' "$login_args" | grep -Eq '^(--login|-[a-zA-Z]*l[a-zA-Z]*)$'; then
+    ok "login shell ($login_src)"
+  elif [ -n "$login_src" ]; then
+    warn "$login_src is not a login shell" "Herdr's shell should be ['...\\Git\\bin\\bash.exe', '--login', '-i'] (windows/herdr-core.config.toml). Agent-run checks inherit the agent's shell; re-run by hand in a new Herdr pane before changing anything."
+  else
+    warn "can't tell whether the launching shell is a login shell" "Run 'bash verify.sh' by hand in a new Herdr pane; the herdr-core check below still verifies --login."
+  fi
 
   if [ -n "${USERPROFILE:-}" ] && has cygpath; then
     up=$(cygpath -u "$USERPROFILE")
@@ -137,7 +155,7 @@ tool node   "Only for plugins that need it (custom-visuals' pbiviz MCP): winget 
 if has jq; then
   if [ "$win" = 1 ] && [ "$(jq -n -r '"x"' | od -c | grep -c '\\r')" -gt 0 ]; then
     if [ "$(jq -b -n -r '"x"' 2>/dev/null | od -c | grep -c '\\r')" -eq 0 ]; then
-      warn "jq writes CRLF unless -b" "Scripts that read jq output need jq -b (managed block aliases it for interactive use only)."
+      fail "jq writes CRLF to scripts" "Install the wrapper: cp windows/jq-wrapper.sh ~/bin/jq && chmod +x ~/bin/jq, then open a new pane. Aliases don't reach scripts such as a work repo's checker."
     else
       fail "jq writes CRLF and has no -b" "Install jq 1.7+."
     fi
@@ -220,8 +238,15 @@ if [ -f "$codex_dir/config.toml" ]; then
   for key in '^model[[:space:]]*=' '^\[tui\]' 'status_line[[:space:]]*='; do
     grep -Eq "$key" "$codex_dir/config.toml" || warn "config.toml lacks $key" "Merge codex/config.toml."
   done
+  # `codex plugin marketplace add` writes this table itself, so its presence is
+  # normal. Only the ref matters, and the work repo's checker compares installed
+  # versions with its pin; here we just report which ref is registered.
+  pbi_ref=$(awk '
+    /^\[/ { inside = ($0 ~ /^\[marketplaces\.power-bi-agentic-development\]/) ; next }
+    inside && /^[[:space:]]*ref[[:space:]]*=/ { sub(/^[^=]*=[[:space:]]*/, ""); gsub(/["\047\r]/, ""); print; exit }
+  ' "$codex_dir/config.toml")
   if grep -Eq '^\[marketplaces\.power-bi-agentic-development\]' "$codex_dir/config.toml"; then
-    warn "Power BI marketplace is pinned in config.toml" "Install it from the work repo's pin with 'codex plugin marketplace add' instead, so the two can't disagree."
+    ok "Power BI marketplace registered in Codex (ref ${pbi_ref:-none}; the work repo checker compares versions)"
   fi
 else
   fail "no $codex_dir/config.toml" "Start codex once and sign in, then merge codex/config.toml."
