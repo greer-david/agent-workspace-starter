@@ -20,10 +20,8 @@ if [[ $- == *i* ]]; then
   export PYTHONUTF8=1
   export PYTHONIOENCODING=utf-8
 
-  # Native jq.exe writes CRLF to Git Bash; -b keeps plain LF.
-  if jq --help 2>/dev/null | grep -q -- '--binary'; then
-    alias jq='jq -b'
-  fi
+  # Native jq.exe writes CRLF to Git Bash. The fix is the ~/bin/jq wrapper
+  # (windows/jq-wrapper.sh), which scripts also see; an alias would not.
 
   # Keep the user's own versions if they already define these.
   alias ll >/dev/null 2>&1 || alias ll='ls -alF'
