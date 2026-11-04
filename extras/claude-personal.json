@@ -1,0 +1,20 @@
+{
+  "_comment": "David's personal Claude Code switches. NOT part of the coworker setup. Apply an entry only if the user asks for it after it has been explained. Power BI plugins come from the work repo's .claude/settings.json and pin, not from here.",
+  "cleanupPeriodDays": 99999,
+  "permissions": {
+    "deny": [
+      "AskUserQuestion", "CronCreate", "CronDelete", "CronList", "DesignSync",
+      "EnterPlanMode", "ExitPlanMode", "PushNotification", "RemoteTrigger",
+      "ReportFindings", "ScheduleWakeup"
+    ]
+  },
+  "disableBundledSkills": true,
+  "disableWorkflows": true,
+  "disableArtifact": true,
+  "autoMemoryEnabled": false,
+  "autoCompactEnabled": false,
+  "enabledPlugins": { "mattpocock-skills@mattpocock": true },
+  "extraKnownMarketplaces": {
+    "mattpocock": { "source": { "source": "github", "repo": "mattpocock/skills" } }
+  }
+}

@@ -1,6 +1,10 @@
+# Merge into $CODEX_HOME/config.toml (default ~/.codex/config.toml); don't replace it.
+# Power BI plugins are NOT here: install them from the work repo's pin with
+# `codex plugin marketplace add ... --ref <pin>` and `codex plugin add ...`.
 model = "gpt-6.1-sol"
 model_reasoning_effort = "low"
 approvals_reviewer = "auto_review"
+
 [tui]
 status_line = ["model-with-reasoning", "context-used", "used-tokens", "context-window-size", "task-progress", "git-branch", "branch-changes"]
 terminal_title = ["spinner", "project", "git-branch"]
@@ -10,44 +14,5 @@ status_line_use_colors = true
 source_type = "git"
 source = "https://github.com/JuliusBrussee/caveman.git"
 
-[marketplaces.power-bi-agentic-development]
-source_type = "git"
-source = "https://github.com/data-goblin/power-bi-agentic-development.git"
-ref = "v26.40.2"
-
 [plugins."caveman@caveman"]
 enabled = true
-
-[plugins."pbip@power-bi-agentic-development"]
-enabled = true
-
-[plugins."semantic-models@power-bi-agentic-development"]
-enabled = true
-
-[plugins."reports@power-bi-agentic-development"]
-enabled = true
-
-[plugins."tabular-editor@power-bi-agentic-development"]
-enabled = true
-
-[plugins."fabric-cli@power-bi-agentic-development"]
-enabled = true
-
-[plugins."goblin-mode@power-bi-agentic-development"]
-enabled = true
-
-[plugins."paginated-reports@power-bi-agentic-development"]
-enabled = true
-
-[plugins."fabric-admin@power-bi-agentic-development"]
-enabled = true
-
-[plugins."pbi-desktop@power-bi-agentic-development"]
-enabled = true
-
-[plugins."etl@power-bi-agentic-development"]
-enabled = true
-
-[plugins."custom-visuals@power-bi-agentic-development"]
-enabled = true
-

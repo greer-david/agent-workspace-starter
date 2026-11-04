@@ -1,0 +1,7 @@
+# Merge into %APPDATA%\herdr-core\config.toml (or $XDG_CONFIG_HOME/herdr-core/config.toml
+# when XDG_CONFIG_HOME is set). Top level, not inside a [table].
+# Literal (single-quoted) strings keep backslashes; no extra quotes around the path.
+# Use the discovered Git for Windows path. bin\bash.exe (not usr\bin\bash.exe)
+# sets up Git Bash's environment. New panes pick this up; existing panes keep
+# their shell.
+shell = ['C:\Program Files\Git\bin\bash.exe', '--login', '-i']

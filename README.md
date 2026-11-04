@@ -1,117 +1,89 @@
 # Agent workspace starter
 
-A sanitized snapshot of David Greer's Herdr, Claude Code and Codex setup, intended for an agent to adapt on a coworker's Windows machine. This is a fresh repository with no original dotfiles history, credentials, personal project paths, work identity, or saved hook approvals.
+David Greer's Herdr + Claude Code + Codex workspace, trimmed to a core that can be set up quickly on **native Windows**. It uses Git Bash as Herdr's shell, with native Claude Code and Codex. It contains no credentials, personal paths, identity or saved trust decisions.
 
-**Windows execution has not been tested.** These are reference assets, not a one-click installer. The setup agent must complete the platform adaptations and verify them locally. No existing user configuration should be overwritten wholesale.
+**Status:** the files are built from fixes proven on Windows 11/Git Bash in another project (jq CRLF, login-file chain, path forms). This exact starter still needs its first end-to-end Windows run. `verify.sh` is the source of truth for "done".
 
-## Included
+## For the setup agent
 
-- `codex/config.toml`: actual reusable model, effort, automatic approval reviewer, footer, terminal title and plugin settings. Power BI plugins record the source snapshot v26.40.2; a supplied work repo's current pin takes precedence.
-- `claude/settings.reference.json`: shared plugins, model/effort, UI and workflow preferences. Private plugins, HEY, clerk, Rex and machine-specific status commands are excluded.
-- `shell/`: merge-only Bash startup templates for Git Bash.
-- `docs/project-setup.md`: required coordination workflow when a work repo supplies its own setup checks and plugin policy.
-- `docs/terminal-workspace.md`: required layout workflow that keeps full agent terminals central with familiar navigation and review panels.
-- `herdr/`: themes, shortcut reference, Files/Changes/Work panels, quick capture, fork-Claude.
-- `scripts/herdr-tab-title.py`: numbered tab-title helper for Claude and Codex; runs only against a detected Herdr terminal.
+The user authorizes installing and configuring this workspace. Follow these rules:
+- Inspect before changing anything.
+- Back up every file before editing it, and merge; never replace a config wholesale.
+- Use the user's own accounts. Never ask for tokens or passwords in chat. The user does interactive logins, SSO and admin prompts themselves.
+- Follow managed policy and existing sandbox settings.
 
-Fresh and continuation prompts: [copy-paste setup prompts](docs/setup-prompts.md). Add the work repository URL when applicable.
+**Order:** Tier 1, then `verify.sh`, then the work repo (if given), then `verify.sh` again. Only offer Tier 2 and 3 after Tier 1 passes.
 
-## Instructions for the setup agent
+### Paused or partial setup
 
-The user authorizes installation and configuration of this workspace. Inspect first, back up before edits, merge existing customizations, and perform the setup. Ask only for information or manual authentication that is actually needed. Follow organization policy and existing sandbox restrictions.
+Run `bash verify.sh` first and fix what it reports, in order. Before fixing, check for running installers and agent sessions. Ask the user before stopping any of them. Keep working installs, plugins and logins.
 
-### Start: fresh install or continuation
+PowerShell as Herdr's default shell is superseded; change only the shell setting. If WSL was introduced, explain what lives there and ask before moving or removing anything.
 
-On a fresh machine, inventory existing tools and follow the setup sequence below. When a work repository is supplied, read and carry out [project setup coordination](docs/project-setup.md) before installing overlapping plugins; its current setup checker and plugin policy govern project requirements. Complete both that checker's results and this starter's workspace checks.
+### Tier 1: core (do all of this)
 
-### 0. Resume a paused setup
+1. **Install** missing tools with winget, if it's available; otherwise use each tool's official installer.
+   - Tools: `Git.Git`, `GitHub.cli`, `jqlang.jq`, `astral-sh.uv`, `Python.Python.3.12`, and Herdr (https://herdr.dev/download/).
+   - Claude Code: native installer, not npm (https://code.claude.com/docs/en/setup).
+   - Codex: https://developers.openai.com/codex/.
+   - Turn off the Microsoft Store `python`/`python3` App execution aliases.
+   - Node is only for plugins that need it.
+   - Reopen Git Bash afterwards so PATH refreshes.
+2. **Herdr shell.** Merge `windows/herdr-core.config.toml` into `%APPDATA%\herdr-core\config.toml`, using the discovered `Git\bin\bash.exe` path. `sh` must be on the **Windows** PATH (herdr-core needs it); `verify.sh` checks this. Test in a new pane; leave existing panes running.
+3. **Startup files.**
+   - Merge `windows/bashrc.block` into `~/.bashrc` as one managed block; replace it between the markers when re-running.
+   - Keep the user's correct customizations. Repair broken ones after a backup.
+   - Make the login file load `.bashrc` (follow `windows/bash_profile.snippet`). A `# generated by Git for Windows` `.bash_profile` is already correct.
+   - Keep tokens, auto-launch commands and installs out of startup files.
+4. **Claude Code.**
+   - Merge `claude/settings.recommended.json` into `~/.claude/settings.json`.
+   - Install its plugins with `claude plugin marketplace add` / `claude plugin install`.
+   - Run `/claude-hud:setup` so the HUD's status line is generated for this machine.
+   - Do not apply `extras/claude-personal.json` unless the user asks for it after it's explained.
+5. **Codex.** Merge `codex/config.toml` into `$CODEX_HOME/config.toml` (default `~/.codex`). Validate the model and footer items against the installed version. If the model isn't available, report it; don't silently swap it.
+6. **Herdr layout and keys.** Use the shipped **Herdr/main** layout: spaces and agents on the left, terminals in the center, Files and Changes on the right. Copy any wanted theme from `herdr/themes/`. **Do not create or edit `keys.json`.** Any edit freezes Herdr's defaults, and the Windows defaults are already tested. See `docs/terminal-workspace.md` for the short layout pass.
+7. Run `bash verify.sh` from a **new Herdr pane**. Fix FAILs; explain any WARN left in place.
 
-This may be a continuation of a setup paused midway. Before any installation, edit, service restart or rollback:
+### Work repo (when the user supplies one)
 
-1. Read the current chat, any local setup record, recent installer results and existing backups. Summarize completed work, incomplete work, and the next pending action. Treat the local machine as the source of truth.
-2. Inspect running installers, package managers and agent sessions. A paused agent may have left a child process running. Let a safe installation finish or report a blocked state; obtain confirmation before terminating a process or interrupting an active installer.
-3. Snapshot current relevant configs and record their paths before editing. Compare existing state with this guide. Resume idempotently from the first unmet requirement rather than repeating the initial bootstrap.
-4. The updated target is **Git Bash as Herdr's default interactive shell, with native Windows Claude Code and Codex**. Keep PowerShell installed for Windows tasks. An already-installed PowerShell 7 is useful and need not be removed. Preserve working native agent installs and completed plugin/auth setup.
-5. If prior work selected PowerShell as the default, change only the necessary shell/config portions. If it introduced WSL, inspect where tools, repositories and credentials actually live; explain any migration and obtain confirmation before moving projects, removing installations or discarding config. Preserve existing files and sessions.
-6. The latest user direction supersedes an earlier recommendation to use PowerShell as the default. Audit pending actions against this target before continuing; report any action whose intent cannot be established.
+Follow `docs/project-setup.md`. In short:
+- The work repo's `scripts/check-setup.sh` and its plugin pin govern project tools and Power BI plugins, for both Claude and Codex.
+- Run `bash verify.sh --repo <clone>` to see both reports.
+- On Windows, if **every** plugin fails, the cause is jq CRLF, not missing plugins.
 
-### 1. Inspect and install
+### Tier 2: after Tier 1 passes (offer)
 
-Inspect Windows architecture, installed versions, PowerShell, Git Bash, WSL, PATH and config-directory overrides. Install Git for Windows if missing. Use its Git Bash as the default interactive shell in Herdr, while keeping agents and Windows tools native. Do not introduce WSL without explaining an actual dependency. Never configure a Linux installation while launching its Windows counterpart, or vice versa.
+**Tab titles.** Copy `windows/herdr-tab-title.py` to a stable folder, e.g. `~/bin`. Add a Stop hook in BOTH `~/.claude/settings.json` and `~/.codex/hooks.json`:
 
-Read current official installation instructions and install missing Herdr, Claude Code, Codex, Git, Python and plugin runtimes as needed. Check available package managers; do not assume winget is installed. Install Node or Bun only as required by selected plugins.
+```
+"<absolute python.exe>" -X utf8 -I "<absolute path>\herdr-tab-title.py"
+```
 
-Official references:
-- Herdr: https://herdr.dev/download/
-- Claude Code: https://code.claude.com/docs/en/setup
-- Codex: https://developers.openai.com/codex/
-- Codex config: https://learn.chatgpt.com/docs/config-file/config-reference
-- Claude HUD: https://github.com/jarrodwatts/claude-hud
+- Hooks don't read `.bashrc`, so use absolute paths.
+- Keep the existing hooks.
+- Read each host's current hook schema before editing.
+- The script hides its own errors. It's done only when visible tab titles change after a turn, including with two sessions in the same folder.
 
-Herdr's official page currently supplies a Windows PowerShell installer and a Start menu application. Recheck the page rather than running a stale command from memory. After installation read Herdr's installed agent guide (`~/.config/herdr-app/AGENTS.md` per its docs) and establish its actual Windows config path.
+### Tier 3: David's personal extras (offer only; each needs Windows adaptation)
 
-### 1a. Configure Git Bash and startup files
+`extras/` holds these extras:
+- The Work panel: Jira through internal `twg` and multiple gh accounts.
+- Capture: an Obsidian inbox.
+- Fork-Claude: needs the native `claude.exe`.
+- Panel shortcut mods.
+- David's macOS `keys.json`, for reference only.
 
-Read this section before editing Herdr shell settings or Bash startup files. The user prefers Bash/Zsh command conventions; Git Bash is the chosen Windows shell. PowerShell remains available for Windows-specific operations.
+They are not needed for a working setup.
 
-1. Locate Git for Windows' actual `bash.exe`; distinguish it from a WSL launcher. Check HOME and the Windows user profile resolve to the intended files. Read existing `.bashrc`, `.bash_profile`, `.bash_login`, and `.profile`, including their source chains.
-2. Read the installed Herdr desktop/core guide and current core config. Current [herdr-core documentation](https://github.com/herdrdev/herdr-core#default-shell) specifies `%APPDATA%\herdr-core\config.toml`, or `$XDG_CONFIG_HOME/herdr-core/config.toml` when set, with a top-level executable/argument array:
+### Finish
 
-   ```toml
-   shell = ['C:\Program Files\Git\bin\bash.exe', '--login', '-i']
-   ```
+Run `verify.sh` once more and walk the user through its "Check by hand" list. Save a short local setup record covering:
+- versions installed
+- files changed
+- backup paths
+- remaining WARNs
+- login and restart steps
 
-   Substitute the discovered executable path. Merge into the proper TOML scope, preserving other settings. Verify against the installed version. Inspect desktop, workspace and launch-template overrides if a new pane still opens PowerShell. Test in a NEW pane; keep existing sessions running. A quoted executable string inside the array must not contain extra shell quote characters.
-3. Back up startup files and merge `shell/bashrc.reference` into `.bashrc`. Use one identifiable managed block; update it on rerun rather than appending duplicates. Preserve correct and useful aliases, prompt and other setup. Repair broken paths, duplicate/conflicting setup and incomplete prior edits after backing up; existing content is not automatically correct. Only add verified tool directories; translate discovered Windows paths with `cygpath` where needed. Keep Git Bash's standard inherited PATH. Ensure `claude`, `codex`, `git`, `hc`, `herdr-app` and the chosen Python/runtime resolve correctly.
-4. Merge `shell/bash-profile.reference` into the active login startup file only if it does not already source `.bashrc`. Bash reads the first available `.bash_profile`, `.bash_login`, or `.profile`; preserve that chain. Do not create a new `.bash_profile` that shadows an existing `.profile` without preserving the latter's behavior. Avoid duplicate or recursive sourcing.
-5. Keep tokens, auto-login commands, agent auto-launch, global MSYS path-conversion switches, and package-install commands out of startup files. Optional prompt tools can be retained if already installed; they are not prerequisites. Hooks may run noninteractively and cannot rely on `.bashrc` or its aliases: give them explicit executable paths and required environment separately. Do not assume selecting Git Bash in Herdr selects Codex's internal command shell.
-6. Validate startup syntax with the discovered Git Bash `bash.exe -n` for each changed file. In a fresh Herdr pane, confirm `$BASH_VERSION`, `$0`, `shopt -q login_shell`, working directory, executable lookup and actual agent launches. Source the managed block twice in a controlled interactive shell and confirm PATH entries do not accumulate. Keep output free of tokens and unrelated environment values.
+Report work-repo results separately from workspace results. Never publish the user's config or record back to this repo.
 
-### 2. Configure Codex
-
-Merge `codex/config.toml` into the active user configuration. When a work repo is supplied, resolve its current plugin selection and pin first via `docs/project-setup.md`; override the starter snapshot accordingly without copying project-only settings globally. Respect CODEX_HOME if set. Validate all fields and footer items against the installed version. Preserve the requested model if available; report incompatibilities instead of silently replacing it. Install marketplaces/plugins through supported commands or UI; config entries alone may not install them.
-
-Explain `approvals_reviewer = "auto_review"` using the installed version's documentation before applying it. Preserve sandbox restrictions and managed policy. Do not trust the user's entire home directory or fabricate hook trust hashes. Let the user approve specific projects and hooks through normal mechanisms.
-
-### 3. Configure Claude Code
-
-Treat `claude/settings.reference.json` as a reference, not a wholesale settings file to apply. Match the model/effort, plugins, HUD and appearance; assess behavioral preferences separately. The permission deny list, long retention, disabled memory/auto-compaction/bundled skills and other workflow switches are David's personal choices, not requirements for the coworker. Explain them and retain the coworker's existing choices unless requested. For a work repo, resolve its plugin selection and pin first via `docs/project-setup.md`, then register marketplaces and install the required plugins through supported commands. The global Matt Pocock plugin is optional when checked-in project skills already provide the desired workflows. Check version compatibility before applying preferences such as disabling auto-compaction, automatic memory, bundled skills or tools. Explain the effects of the permission deny list; these are source preferences, not prerequisites for Herdr. Preserve a coworker's existing policy settings.
-
-Install claude-hud as a plugin and run its supported setup workflow (currently `/claude-hud:setup`; verify). Generate the Windows statusLine command for the selected shell/runtime. Do not use macOS Homebrew paths. Configure runtime dependencies and verify the HUD actually renders.
-
-### 4. Configure Herdr
-
-Merge themes and desired mods into the active config directory. Preserve unrelated mods and app-generated state. Use the installed Herdr guide to validate API compatibility.
-
-`herdr/keys.json` is the original macOS shortcut reference, NOT a Windows file to copy unchanged. Use Windows defaults for standard application actions, then map custom actions to supported, non-conflicting Windows shortcuts. Check both global and terminal bindings; naive Cmd-to-Ctrl replacement collides with existing space shortcuts and terminal control keys. Update shortcut hints in mods to match.
-
-Windows adaptations still required:
-- Work mod: resolve browser opening through a Windows-compatible mechanism. For `env` and `test`, either use verified Git for Windows executables with explicit paths or implement supported native equivalents; Herdr mod subprocesses do not inherit Bash aliases and cannot assume its startup files ran. Discover GitHub CLI's actual Windows config directory, including GH_CONFIG_DIR; do not assume `~/.config/gh`. Pass tokens through a supported environment mechanism, never print them or store them in files. Work data must be fetched from the coworker's own authenticated accounts.
-- Work Jira integration requires the `twg` CLI and its authentication. If unavailable, make the GitHub portion work and disable/explain Jira; do not assume access to David's internal tooling or accounts.
-- Capture defaults to `~/Notes/Inbox`. Ask for the desired destination, create it if authorized, and change the path and displayed label together. Preserve duplicate-name behavior and prevent overwrites.
-- Fork-Claude checks foreground process and session files. The bundled filename check accepts Windows separators and exe/cmd suffixes, but verify actual Windows process/session discovery. If Claude runs through a wrapper, adapt detection using installed tool documentation. Forking shares the working tree; it does not create a worktree.
-- Read the installed guide for agent status integration. Configure it for both agents; do not equate tab naming with working/waiting/completed status.
-
-### 4a. Make the workspace approachable while retaining full terminal access
-
-After Git Bash and both agents work, read and carry out [the terminal workspace guide](docs/terminal-workspace.md). This is part of the requested setup. Keep real Claude/Codex terminals central; use visible project/agent navigation, launch actions, Files/Changes and a separate Open Shell action. Reuse built-in controls first. Verify the resulting layout on the coworker's machine; the guide is an implementation brief, not an already installed layout.
-
-### 5. Wire tab titles
-
-Install `scripts/herdr-tab-title.py` in a stable user tools directory. Wire the supported Stop hook in BOTH Claude and Codex to an explicit Python executable and the script's quoted absolute Windows path. Preserve existing hooks. Read current hook schemas before editing; do not assume both agents use identical casing or event fields.
-
-Do not rely on the script's Unix shebang. Resolve `herdr-app` and `hc` from the actual hook environment, including executable extensions if required. The helper normalizes transcript separators for Codex detection, but further Windows adaptations may be needed. Read the script: its errors intentionally do not block agents, so absence of hook errors does NOT prove tab titles work. Verify visible title changes. Exercise multiple sessions in the same directory to avoid renaming the wrong tab. Preserve manually named tabs.
-
-### 6. Verify and finish
-
-If a work repo was supplied, rerun its setup checker and complete its manual checklist per `docs/project-setup.md`. Report all unresolved or skipped checks separately from Herdr verification.
-
-Complete the acceptance checks in `docs/terminal-workspace.md`, including visible launch controls, a separate Git Bash shell, retained interactive terminal behavior and laptop-sized layout review.
-
-Verify a NEW Herdr pane opens login-interactive Git Bash, startup files load once, and tools resolve without depending on the old PowerShell session. Verify actual launches of both agents inside Herdr; footer/HUD rendering; agent activity status; tab-title updates after turns; Files, Changes and Work panels; quick capture into the chosen destination; fork-Claude; keyboard shortcuts; plugin loading and runtime dependencies. Authenticate using the coworker's own accounts; never request credentials in chat.
-
-Record checks actually performed separately from checks needing user interaction. Save a local setup record of versions, changed files, backup locations, shortcuts, any unsupported features, and login/restart steps. Do not claim Windows compatibility based only on static inspection.
-
-## Scope
-
-No Git identity, SSH configuration, Windows VM bridge, window-manager setup, browser bookmarks, private session history, private plugin, account token, or saved trust decision is included. Do not publish any of the coworker's generated configuration or personal setup record back to this repository.
+Prompts to paste: [docs/setup-prompts.md](docs/setup-prompts.md).
