@@ -169,10 +169,15 @@ py=""
 for c in python3 python py; do
   if has "$c"; then
     path=$(command -v "$c")
-    case "$path" in
-      *WindowsApps*) warn "$c is the Microsoft Store alias ($path)" "Settings > Apps > Advanced app settings > App execution aliases: turn off python/python3, then install: winget install --id Python.Python.3.12 -e" ;;
-      *) if [ -z "$py" ] && "$c" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)' >/dev/null 2>&1; then py=$c; fi ;;
-    esac
+    # A WindowsApps path is either the Store's install stub (fails, or opens
+    # the Store) or a real Store-installed Python. Judge by running it.
+    if "$c" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)' </dev/null >/dev/null 2>&1; then
+      [ -n "$py" ] || py=$c
+    else
+      case "$path" in
+        *WindowsApps*) warn "$c is the Microsoft Store install stub ($path)" "Settings > Apps > Advanced app settings > App execution aliases: turn off python/python3, then install: winget install --id Python.Python.3.12 -e" ;;
+      esac
+    fi
   fi
 done
 if [ -n "$py" ]; then ok "python: $py ($(command -v "$py"), $("$py" -c 'import platform; print(platform.python_version())'))"
