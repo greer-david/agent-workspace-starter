@@ -1,0 +1,6 @@
+# Merge into the EXISTING active Bash login startup file.
+# Bash uses the first readable file among .bash_profile, .bash_login, .profile.
+# Adding a new .bash_profile can hide an existing .profile; inspect first.
+if [ -f "$HOME/.bashrc" ]; then
+  . "$HOME/.bashrc"
+fi
