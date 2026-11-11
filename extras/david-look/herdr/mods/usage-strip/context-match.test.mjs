@@ -1,0 +1,13 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+const {resolveCodexSession,selectedContext}=await import(process.env.DATA_MODULE??'./data.mjs');
+const index=[{id:'current',thread_name:'Continue Herdr navigation review'}];
+const agent={app:'codex',tab_name:'2 · Herdr follow-up and team setup',title:'⠇ Continue Herdr navigation review | personal-vault | main'};
+test('custom tab name resolves through Codex terminal title',()=>assert.equal(resolveCodexSession(agent,index),'current'));
+test('undecorated idle terminal title resolves',()=>assert.equal(resolveCodexSession({...agent,title:'Continue Herdr navigation review | personal-vault | main'},index),'current'));
+test('existing exact tab lookup remains valid',()=>assert.equal(resolveCodexSession({tab_name:'2 · Continue Herdr navigation review'},index),'current'));
+test('duplicate session names remain unavailable',()=>assert.equal(resolveCodexSession(agent,[...index,{id:'other',thread_name:index[0].thread_name}]),null));
+test('conflicting tab and terminal matches remain unavailable',()=>assert.equal(resolveCodexSession(agent,[...index,{id:'other',thread_name:'Herdr follow-up and team setup'}]),null));
+test('wrong session data is rejected',()=>assert.equal(selectedContext(agent,index,[{sessionId:'other',occupancy:50000,window:475000,contextSampled:1}]),null));
+test('selected session context appears',()=>assert.equal(selectedContext(agent,index,[{sessionId:'current',occupancy:50000,window:475000,contextSampled:1}]).used,50000));
+test('latest title for a session wins',()=>assert.equal(resolveCodexSession(agent,[...index,{id:'current',thread_name:'Renamed'}]),null));

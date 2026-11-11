@@ -1,0 +1,5 @@
+[tui]
+status_line = ["model-with-reasoning", "context-used", "context-window-size", "task-progress", "git-branch", "branch-changes"]
+terminal_title = ["spinner", "thread", "project", "git-branch"]
+status_line_use_colors = true
+
