@@ -1,0 +1,22 @@
+{
+  "gitStatus": {
+    "enabled": true,
+    "showDirty": true,
+    "showAheadBehind": true,
+    "showFileStats": false
+  },
+  "display": {
+    "showTools": true,
+    "showAgents": true,
+    "showTodos": true,
+    "showSkills": true,
+    "showDuration": false,
+    "showConfigCounts": false,
+    "showSessionName": true,
+    "showCost": false,
+    "showSessionTokens": false,
+    "contextValue": "both",
+    "externalUsageWritePath": "<HOME>/.config/herdr-app/data/usage-strip/claude.json",
+    "showUsage": false
+  }
+}

@@ -6,7 +6,7 @@ import { View, div } from "gpui-kit";
 import { v_flex, h_flex, TextareaState, Textarea } from "gpui-base";
 import { home, theme, props, closeOverlay, notify, writeTextFile, readTextFile, nextCommand } from "herdr";
 
-const INBOX = () => `${home()}/Notes/Inbox`;
+const INBOX = () => `${home()}/repos/personal-vault/Inbox`;
 
 const pad = (n) => String(n).padStart(2, "0");
 const today = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -60,7 +60,7 @@ export default class Capture extends View {
     return v_flex().w_full().p(16).gap(10).bg(t.popover).text_size(13)
       .child(h_flex().justify_between().items_center()
         .child(div().font_semibold().text_color(t.foreground).child("Capture to Inbox"))
-        .child(div().text_size(11).text_color(t.dim).child("Notes/Inbox")))
+        .child(div().text_size(11).text_color(t.dim).child("personal-vault/Inbox")))
       .child(Textarea.new(this.area).w_full().p(10).rounded(8).border(1).border_color(t.input)
         .bg(t.background).text_color(t.foreground))
       .when(this.error, (el) => el.child(div().text_size(12).text_color(t.blocked).child(this.error)))

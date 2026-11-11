@@ -66,16 +66,17 @@ Follow `docs/project-setup.md`. In short:
 - Read each host's current hook schema before editing.
 - The script hides its own errors. It's done only when visible tab titles change after a turn, including with two sessions in the same folder.
 
-### Tier 3: David's personal extras (offer only; each needs Windows adaptation)
+### Tier 3: David's look and extras (when the user wants them)
 
-`extras/` holds these extras:
+**David's look** (`extras/david-look/`) is his current Herdr layout, add-on mods, Herdr settings, Claude HUD settings and Codex footer, plus his macOS `keys.json` for reference. It's a reference snapshot, not a tested Windows setup. If the user wants it, follow `extras/david-look/README.md`: replicate it on this machine, adapt what doesn't work, and make whatever changes or additions the user asks for. The result is the user's own setup and doesn't need to match David's.
+
+**Personal mods** (`extras/herdr-mods/`): offer these one at a time; each needs adapting.
 - The Work panel: Jira through internal `twg` and multiple gh accounts.
 - Capture: an Obsidian inbox.
 - Fork-Claude: needs the native `claude.exe`.
 - Panel shortcut mods.
-- David's macOS `keys.json`, for reference only.
 
-They are not needed for a working setup.
+None of Tier 3 is needed for a working setup.
 
 ### Finish
 

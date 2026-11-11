@@ -4,7 +4,7 @@
     "cmd-h": "app.hide",
     "cmd-alt-h": "app.hide_others",
     "cmd-t": "tab.new",
-    "cmd-w": "tab.close",
+    "cmd-w": "pane.close",
     "ctrl-tab": "tab.next",
     "ctrl-shift-tab": "tab.prev",
     "cmd-shift-]": "tab.next",
@@ -62,7 +62,11 @@
     "cmd-shift-g": "mod.open:panel-changes",
     "cmd-shift-j": "mod.open:panel-work",
     "cmd-shift-n": "mod.open:capture",
-    "cmd-shift-f": "mod.open:fork-claude"
+    "cmd-shift-f": "mod.open:fork-claude",
+    "cmd-alt-w": "tab.close",
+    "cmd-shift-right": "pane.split:right",
+    "cmd-shift-down": "pane.split:down",
+    "cmd-k": "mod.open:picker"
   },
   "terminal": {
     "cmd-c": "terminal.copy",
